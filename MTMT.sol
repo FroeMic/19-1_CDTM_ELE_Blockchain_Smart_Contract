@@ -1,50 +1,40 @@
 pragma solidity >=0.4.22 <0.7.0;
 pragma experimental ABIEncoderV2;
 
-/// @title Micro Task Mangement Tool.
+// @title Micro Task Mangement Tool.
 contract MTMT {
 
     struct Submission {
         address owner;
         bytes32 description;
         uint256 voteCount;
-        
+
         mapping (address => bool) voted;
     }
 
-    // A single Task
     struct Task {
         address owner; // person creating the task
         bool open;
         uint256 deadline; // time until the task has to be finished
         uint256 reward; // Reward payed for the successful completion of the contract
-        
         bytes32 description; // description of the task
 
-        Submission[] submissionList; // List of different people participating in the challenge
+        //Submission[] submissionList; // List of different people participating in the challenge
     }
-
 
     uint256 private nextSubmissionID;
 
     Task[] internal taskList;
+    
     // mapping(address => uint256) public reputationList;
 
     constructor() public {
-        nextTaskID = 0;
+        nextSubmissionID = 0;
     }
 
     // creates a new task
-    
-    function createTask(uint256 _index, bytes32 _description, uint256 _deadline, uint256 _reward) public payable returns (uint256 index) {
-        Task memory newTask = (
-            msg.sender,
-            true,
-            _deadline,
-            _reward,
-            _description,
-            new Submission[],
-        );
+    function createTask(uint256 _index, bytes32 _description, uint256 _deadline) public payable returns (uint256 index) {
+        Task memory newTask = Task(msg.sender, true, _deadline, msg.value, _description);
         
         if (_index < taskList.length && taskList[_index].open == false) {
             taskList[_index] = newTask;
@@ -64,26 +54,22 @@ contract MTMT {
 
     // }
 
-    // // returns a specific task
-    // function getTask(uint256 id) external {
-    function getTask(uint256 _id) external returns (uint256,address ,Multihash memory , uint256 ,bool ,Submission[] memory) {
-        uint256 id; 
-        address owner; 
-        Multihash memory description;
-        uint256 reward; 
+    // returns a specific task
+    function getTask(uint256 _index) external returns (address, bool, uint256, uint256, bytes32) {
+        address owner;
         bool open;
-        Submission[] memory submissionList;
-       
-       id = taskList[_id].id;
-       owner = taskList[_id].owner;
-       description = taskList[_id].description;
-       reward = taskList[_id].reward;
-       open = taskList[_id].open;
-       submissionList = taskList[_id].submissionList;
-       
-       return (id, owner, description, reward, open, submissionList);
+        uint256 deadline;
+        uint256 reward;
+        bytes32 description;
+
+        owner = taskList[_index].owner;
+        open = taskList[_index].open;
+        deadline = taskList[_index].deadline;
+        reward = taskList[_index].reward;
+        description = taskList[_index].description;
+
+        return (owner, open, deadline, reward, description);
     }
-    // }
 
     // // adds a new submission for a task
     // function addSubmission(uint256 task_id, Multihash calldata description) external {
@@ -117,5 +103,4 @@ contract MTMT {
     // function updateReputation() internal {
 
     // }
-
 }
