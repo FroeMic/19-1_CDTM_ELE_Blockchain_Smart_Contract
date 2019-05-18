@@ -4,55 +4,55 @@ pragma experimental ABIEncoderV2;
 /// @title Micro Task Mangement Tool.
 contract MTMT {
 
-    // Struct that stores and IPFS reference.
-    struct Multihash {
-        bytes32 hash;
-        uint8 hash_function;
-        uint8 size;
-    }
-
-    enum VoteState {OPEN, DECLINED, ACCEPTED}
-
-    struct Vote {
-        address voter;
-        bool approved;
-        uint256 reputation;
-    }
-
     struct Submission {
-        uint256 id;
         address owner;
-        Multihash description;
-        VoteState state;
-        mapping(uint256 => Vote) voteList;
+        bytes32 description;
+        uint256 voteCount;
+        
+        mapping (address => bool) voted;
     }
 
     // A single Task
     struct Task {
-        uint256 id; // a unique id of the task
         address owner; // person creating the task
-        // uint deadline; // time until the task has to be finished
-        Multihash description; // description of the task
-        uint256 reward; // Reward payed for the successful completion of the contract
         bool open;
-        mapping(uint256 => Submission) submissionList;
+        uint256 deadline; // time until the task has to be finished
+        uint256 reward; // Reward payed for the successful completion of the contract
+        
+        bytes32 description; // description of the task
+
+        Submission[] submissionList; // List of different people participating in the challenge
     }
 
 
-    uint256 private nextTaskID;
     uint256 private nextSubmissionID;
 
-    mapping(uint256 => Task) public taskList;
-    mapping(address => uint256) public reputationList;
+    Task[] internal taskList;
+    // mapping(address => uint256) public reputationList;
 
     constructor() public {
         nextTaskID = 0;
     }
 
     // creates a new task
-    function createTask(Multihash memory description, uint deadline) public payable {
-        taskList[nextTaskID] = Task(nextTaskID, msg.sender, description, msg.value, true);
-        nextTaskID++;
+    
+    function createTask(uint256 _index, bytes32 _description, uint256 _deadline, uint256 _reward) public payable returns (uint256 index) {
+        Task memory newTask = (
+            msg.sender,
+            true,
+            _deadline,
+            _reward,
+            _description,
+            new Submission[],
+        );
+        
+        if (_index < taskList.length && taskList[_index].open == false) {
+            taskList[_index] = newTask;
+            index = _index;
+        } else {
+            index = taskList.push(newTask);
+        }
+        return index;
     }
 
     // // returns a list of all  tasks
@@ -66,7 +66,23 @@ contract MTMT {
 
     // // returns a specific task
     // function getTask(uint256 id) external {
-
+    function getTask(uint256 _id) external returns (uint256,address ,Multihash memory , uint256 ,bool ,Submission[] memory) {
+        uint256 id; 
+        address owner; 
+        Multihash memory description;
+        uint256 reward; 
+        bool open;
+        Submission[] memory submissionList;
+       
+       id = taskList[_id].id;
+       owner = taskList[_id].owner;
+       description = taskList[_id].description;
+       reward = taskList[_id].reward;
+       open = taskList[_id].open;
+       submissionList = taskList[_id].submissionList;
+       
+       return (id, owner, description, reward, open, submissionList);
+    }
     // }
 
     // // adds a new submission for a task
