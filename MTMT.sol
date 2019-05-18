@@ -1,4 +1,5 @@
 pragma solidity >=0.4.22 <0.7.0;
+pragma experimental ABIEncoderV2;
 
 /// @title Micro Task Mangement Tool.
 contract MTMT {
@@ -44,61 +45,60 @@ contract MTMT {
     mapping(uint256 => Task) public taskList;
     mapping(address => uint256) public reputationList;
 
-    function MTMT() public {
+    constructor() public {
         nextTaskID = 0;
     }
 
     // creates a new task
-    function createTask(Multihash description, uint deadline) external {
-        Task memory newTask;
-        newTask = Task(nextTaskID, msg.sender, description, msg.value, true);
-        taskList[nextTaskID] = newTask;
+    function createTask(Multihash memory description, uint deadline) public payable {
+        taskList[nextTaskID] = Task(nextTaskID, msg.sender, description, msg.value, true);
         nextTaskID++;
     }
 
-    // returns a list of all  tasks
-    function getTasks() external {
+    // // returns a list of all  tasks
+    // function getTasks() external {
 
-    }
-    // returns a list of all open tasks
-    function getOpenTasks() external {
+    // }
+    // // returns a list of all open tasks
+    // function getOpenTasks() external {
 
-    }
+    // }
 
-    // returns a specific task
-    function getTask(uint256 id) external {
+    // // returns a specific task
+    // function getTask(uint256 id) external {
 
-    }
+    // }
 
-    // adds a new submission for a task
-    function addSubmission(uint256 task_id, Multihash description) {
+    // // adds a new submission for a task
+    // function addSubmission(uint256 task_id, Multihash calldata description) external {
 
-    }
+    // }
 
-    function addVote(uint256 submission_id, bool approved) {
+    // function addVote(uint256 submission_id, bool approved) external {
 
-        // Todo: if the 5th submissions is triggered, close the task
-    }    
+    //     // Todo: if the 5th submissions is triggered, close the task
+    // }    
+    
+    
+    // function terminateTask() external {
+    //     // can only be called after the deadline of a task
+    //     // transfers the reward back to the owner
+    // }
 
-    function evaluateTask(uint256 task_id) internal {
-        // 1. get all submissions
-        // 2. count approved/disapproved votes
-        // 2.1 If disapproved, set state to DECLINED
-        // 2.2 If approved, set state to APPROVED, pay out reward and close task
-        // 3. update reputation
-    }
+    // function evaluateTask(uint256 task_id) internal {
+    //     // 1. get all submissions
+    //     // 2. count approved/disapproved votes
+    //     // 2.1 If disapproved, set state to DECLINED
+    //     // 2.2 If approved, set state to APPROVED, pay out reward and close task
+    //     // 3. update reputation
+    // }
 
-    function transferReward(uint256 task_id) internal {
+    // function transferReward(uint256 task_id) internal {
         
-    }
+    // }
 
-    function updateReputation() internal {
+    // function updateReputation() internal {
 
-    }
-
-    function terminateTask() {
-        // can only be called after the deadline of a task
-        // transfers the reward back to the owner
-    }
+    // }
 
 }
