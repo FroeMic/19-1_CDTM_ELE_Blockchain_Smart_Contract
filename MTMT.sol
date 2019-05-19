@@ -18,6 +18,7 @@ contract MTMT {
         uint256 deadline; // time until the task has to be finished
         uint256 reward; // Reward payed for the successful completion of the contract
         bytes32 description; // description of the task
+        address completion_owner; // mvp for task completion
 
         //Submission[] submissionList; // List of different people participating in the challenge
     }
@@ -26,62 +27,56 @@ contract MTMT {
 
     Task[] internal taskList;
     
-    // mapping(address => uint256) public reputationList;
+    //mapping(address => uint256) public reputationList;
 
     constructor() public {
         nextSubmissionID = 0;
     }
 
-    // creates a new task
-    function createTask(uint256 _index, bytes32 _description, uint256 _deadline) public payable returns (uint256 index) {
-        Task memory newTask = Task(msg.sender, true, _deadline, msg.value, _description);
-        
-        if (_index < taskList.length && taskList[_index].open == false) {
-            taskList[_index] = newTask;
-            index = _index;
-        } else {
-            index = taskList.push(newTask);
-        }
-        return index;
+    function addTask(bytes32 _description, uint256 _deadline) public payable returns (uint256 index) {
+        Task memory newTask = Task(msg.sender, true, _deadline, msg.value, _description, address(0));
+        index = taskList.push(newTask);
+        return index-1;
     }
 
-    // // returns a list of all  tasks
-    // function getTasks() external {
+    function getAllTasks() external view returns (Task[] memory) {
+        return taskList;
+    }
 
-    // }
-    // // returns a list of all open tasks
-    // function getOpenTasks() external {
-
-    // }
-
-    // returns a specific task
-    function getTask(uint256 _index) external returns (address, bool, uint256, uint256, bytes32) {
+    function getTask(uint256 _index) external view returns (address, bool, uint256, uint256, bytes32, address) {
         address owner;
         bool open;
         uint256 deadline;
         uint256 reward;
         bytes32 description;
+        address completion_owner;
 
         owner = taskList[_index].owner;
         open = taskList[_index].open;
         deadline = taskList[_index].deadline;
         reward = taskList[_index].reward;
         description = taskList[_index].description;
+        completion_owner = taskList[_index].completion_owner;
 
-        return (owner, open, deadline, reward, description);
+        return (owner, open, deadline, reward, description, completion_owner);
     }
+    
+    function completeTask(uint256 _index) external payable {
+        taskList[_index].open = false;
+        taskList[_index].completion_owner = msg.sender;
+    }
+
+    // // returns a list of all open tasks
+    // function getOpenTasks() external {
+    // }
 
     // // adds a new submission for a task
     // function addSubmission(uint256 task_id, Multihash calldata description) external {
-
     // }
 
     // function addVote(uint256 submission_id, bool approved) external {
-
     //     // Todo: if the 5th submissions is triggered, close the task
-    
     // }    
-    
     
     // function terminateTask() external {
     //     // can only be called after the deadline of a task
@@ -97,10 +92,8 @@ contract MTMT {
     // }
 
     // function transferReward(uint256 task_id) internal {
-        
     // }
 
     // function updateReputation() internal {
-
     // }
 }
