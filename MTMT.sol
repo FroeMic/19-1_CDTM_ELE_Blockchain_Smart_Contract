@@ -19,6 +19,7 @@ contract MTMT {
         uint256 reward; // Reward payed for the successful completion of the contract
         bytes32 description; // description of the task
         address payable completion_owner; // mvp for task completion
+        bytes32 completion_description;
 
         //Submission[] submissionList; // List of different people participating in the challenge
     }
@@ -34,7 +35,7 @@ contract MTMT {
     }
 
     function addTask(bytes32 _description, uint256 _deadline) public payable returns (uint256 index) {
-        Task memory newTask = Task(msg.sender, true, _deadline, msg.value, _description, address(0));
+        Task memory newTask = Task(msg.sender, true, _deadline, msg.value, _description, address(0), 0x0);
         index = taskList.push(newTask);
         return index-1;
     }
@@ -43,13 +44,14 @@ contract MTMT {
         return taskList;
     }
 
-    function getTask(uint256 _index) external view returns (address, bool, uint256, uint256, bytes32, address) {
+    function getTask(uint256 _index) external view returns (address, bool, uint256, uint256, bytes32, address, bytes32) {
         address owner;
         bool open;
         uint256 deadline;
         uint256 reward;
         bytes32 description;
         address completion_owner;
+        bytes32 completion_description;
 
         owner = taskList[_index].owner;
         open = taskList[_index].open;
@@ -57,13 +59,15 @@ contract MTMT {
         reward = taskList[_index].reward;
         description = taskList[_index].description;
         completion_owner = taskList[_index].completion_owner;
+        completion_description = taskList[_index].completion_description;
 
-        return (owner, open, deadline, reward, description, completion_owner);
+        return (owner, open, deadline, reward, description, completion_owner, completion_description);
     }
     
-    function completeTask(uint256 _index) external payable {
+    function submitTaskSolution(uint256 _index, bytes32 completion_description) external payable {
         taskList[_index].open = false;
         taskList[_index].completion_owner = msg.sender;
+        taskList[_index].completion_description = completion_description;
     }
     
     function transferReward(uint256 _index) external payable {
@@ -72,11 +76,11 @@ contract MTMT {
         }
     }
 
-    // // returns a list of all open tasks
+    // returns a list of all open tasks
     // function getOpenTasks() external {
     // }
 
-    // // adds a new submission for a task
+    // adds a new submission for a task
     // function addSubmission(uint256 task_id, Multihash calldata description) external {
     // }
 
