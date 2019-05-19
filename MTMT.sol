@@ -2,6 +2,7 @@ pragma solidity >=0.4.22 <0.7.0;
 pragma experimental ABIEncoderV2;
 
 // @title Micro Task Mangement Tool.
+// https://medium.com/coinmonks/interacting-with-ethereum-smart-contracts-through-web3-js-e0efad17977
 contract MTMT {
 
     struct Submission {
