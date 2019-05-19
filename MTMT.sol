@@ -2,7 +2,6 @@ pragma solidity >=0.4.22 <0.7.0;
 pragma experimental ABIEncoderV2;
 
 // @title Micro Task Mangement Tool.
-// https://medium.com/coinmonks/interacting-with-ethereum-smart-contracts-through-web3-js-e0efad17977
 contract MTMT {
 
     struct Submission {
@@ -19,19 +18,19 @@ contract MTMT {
         uint256 deadline; // time until the task has to be finished
         uint256 reward; // Reward payed for the successful completion of the contract
         bytes32 description; // description of the task
-        address completion_owner; // mvp for task completion
+        address payable completion_owner; // mvp for task completion
 
         //Submission[] submissionList; // List of different people participating in the challenge
     }
 
-    uint256 private nextSubmissionID;
+    //uint256 private nextSubmissionID;
 
     Task[] internal taskList;
     
     //mapping(address => uint256) public reputationList;
 
     constructor() public {
-        nextSubmissionID = 0;
+        //nextSubmissionID = 0;
     }
 
     function addTask(bytes32 _description, uint256 _deadline) public payable returns (uint256 index) {
@@ -66,6 +65,12 @@ contract MTMT {
         taskList[_index].open = false;
         taskList[_index].completion_owner = msg.sender;
     }
+    
+    function transferReward(uint256 _index) external payable {
+        if (taskList[_index].open == false) {
+            taskList[_index].completion_owner.transfer(taskList[_index].reward);
+        }
+    }
 
     // // returns a list of all open tasks
     // function getOpenTasks() external {
@@ -90,9 +95,6 @@ contract MTMT {
     //     // 2.1 If disapproved, set state to DECLINED
     //     // 2.2 If approved, set state to APPROVED, pay out reward and close task
     //     // 3. update reputation
-    // }
-
-    // function transferReward(uint256 task_id) internal {
     // }
 
     // function updateReputation() internal {
